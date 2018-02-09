@@ -9,9 +9,6 @@ def predict_test(model, test_loader):
 
 def train(model, train_loader, val_loader, val_labels, model_save_path):
     epoch_id = 0
-    current_accum = 1
-    model.set_grad_accum(current_accum)
-    best_loss_epoch_no = -1
     best_loss = 1000
     while True:
         model.fit_generator(train_loader)
@@ -24,15 +21,10 @@ def train(model, train_loader, val_loader, val_labels, model_save_path):
         model.scheduler_step(loss, epoch_id)
         if loss < best_loss:
             best_loss = loss
-            best_loss_epoch_no = epoch_id
             model.save(model_save_path)
-        elif epoch_id - best_loss_epoch_no > 7 and False:
-            current_accum *= 2
-            model.set_grad_accum(current_accum)
-            best_loss_epoch_no = epoch_id
-            print("Increasing grad accum to {0}".format(current_accum))
 
         epoch_id += 1
 
         if epoch_id == NUM_EPOCH:
             break
+
